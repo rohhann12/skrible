@@ -7,6 +7,6 @@ export function handleMessage(ws:any,userSocket:WebSocket,raw:any){
     if(parse.message.type===JOIN_ROOM){
         const userId=parse.message.userId
         const roomId=parse.message.roomId
-        room_Manager.getInstace().addUser(userId,roomId)
+        room_Manager.addUser(userId,roomId)
     }
 }

@@ -5,23 +5,25 @@ interface User{
 }
 
 export class roomManager{
-    private instance:roomManager
-    private userMap=new Map<string,User[]>()
+    private static instance:roomManager
+    private userMap:any
 
-    constructor(){
-        this.instance=new roomManager()
+    private constructor(){
+        // this.instance=new roomManager()
+        this.userMap=new Map<string,User[]>()
     }
 
-    public getInstace(){
-        if(!this.instance){
-            return new roomManager()
-        }
-        return this.instance
+    static getInstance() {
+    if (!roomManager.instance) {
+      roomManager.instance = new roomManager();
     }
+
+    return roomManager.instance;
+  }
 
     public addUser(userId:string,roomId:string){
         const roomState=this.getRoomState(roomId)
-        const findUser=roomState?.find(u=>u.userId===userId)
+        const findUser=roomState?.find((u:any)=>u.userId===userId)
         if(findUser===undefined){
             this.addInRoom(roomId,userId)
         }
@@ -45,7 +47,7 @@ export class roomManager{
     }
     private removeFromRoom(userId:string,roomId:string){
         const roomState=this.getRoomState(roomId)
-        roomState?.filter(u=>u.userId!==userId)
+        roomState?.filter((u:any)=>u.userId!==userId)
         return roomState
     }
 

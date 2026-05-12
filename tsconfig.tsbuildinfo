@@ -1,1 +1,1 @@
-{"root":["./src/server.ts","./src/config/prisma.ts","./src/middleware/auth.ts","./src/modules/room/roommanager.ts","./src/routes/auth.ts","./src/routes/userroutes.ts","./src/services/authservice.ts","./src/types/types.ts","./src/ws/handler.ts","./src/ws/index.ts"],"errors":true,"version":"6.0.3"}
+{"root":["./src/server.ts","./src/config/prisma.ts","./src/middleware/auth.ts","./src/modules/room/roommanager.ts","./src/routes/auth.ts","./src/routes/userroutes.ts","./src/services/authservice.ts","./src/types/types.ts","./src/ws/handler.ts","./src/ws/index.ts"],"version":"6.0.3"}

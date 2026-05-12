@@ -1,5 +1,6 @@
 import express from 'express'
 import authRoutes from './routes/auth.js'
+import userRoutes from './routes/userRoutes.js'
 import http from "http";
 import { initializeWebSocket } from './ws/index.js';
 import { roomManager } from './modules/room/roomManager.js';
@@ -10,7 +11,7 @@ const server=http.createServer(app)
 
 initializeWebSocket(server)
 
-export const room_Manager=new roomManager()
+export const room_Manager=roomManager.getInstance();
 
 app.use(express.json())
 app.use('/auth', authRoutes)
