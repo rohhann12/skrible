@@ -26,12 +26,15 @@ export class roomManager{
             this.addInRoom(roomId,userId)
         }
     }
-
-    public getRoomState(roomId:string){
+    public removeUser(userId:string,roomId:string){
+        this.removeFromRoom(userId,roomId)
+        return this.userMap
+    }
+    private getRoomState(roomId:string){
         const getRoomState=this.userMap.get(roomId)
         return getRoomState
     }
-    public addInRoom(roomId:string,userId:string){
+    private addInRoom(roomId:string,userId:string){
         let updateRoomstate
         const getState=this.getRoomState(roomId) ?? []
         if(getState){
@@ -40,5 +43,11 @@ export class roomManager{
         }
         return updateRoomstate
     }
+    private removeFromRoom(userId:string,roomId:string){
+        const roomState=this.getRoomState(roomId)
+        roomState?.filter(u=>u.userId!==userId)
+        return roomState
+    }
+
        
 }

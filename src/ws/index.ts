@@ -1,6 +1,6 @@
 import { Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import { handleMessage } from "./handlers";
+import { handleMessage } from "./handler.js";
 
 export function initializeWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
