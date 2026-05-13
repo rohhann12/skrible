@@ -1,7 +1,9 @@
+import { prisma } from "../../config/prisma.js"
+import type WebSocket from "ws"
 
 interface User{
     userId:string
-    roomId:string
+    // roomId:string
 }
 
 export class roomManager{
@@ -22,32 +24,48 @@ export class roomManager{
 
     return roomManager.instance;
   }
-    public createRoom(userId:string,socketId:string){
+    public async createRoom(userId:string,socketId:string,ws:WebSocket){
         if(this.reverserUserMap.get(socketId)!==undefined){
             console.log("user already had a room")
             return
         }
         const roomId=(Math.random()*10000).toString().substring(0,4)
-        // roomId banegi woh return krenge
+        // roomId banegi woh return krenge\
+        const addInDb=await prisma.room.create({
+            data: {
+                roomId,
+                userConnected: [userId],
+            },
+        })
+        if(!addInDb){
+            console.log("db write faield")
+
+        }
         console.log("before room init",this.userMap)
-        // piche state maintain krenge sarein users ki uske 
-        this.userMap.set(roomId,[userId])
+        this.userMap.set(roomId,[{userId:userId}])
         this.reverserUserMap.set(socketId,roomId)
         console.log("after room init",this.userMap)
+        console.log("sending ROOM_CREATED",roomId)
+        ws.send(JSON.stringify({ type: "ROOM_CREATED", roomId }))
     }
 
-    public addUser(userId:string,roomId:string){
+    public addUser(ws:WebSocket,userId:string,roomId:string):boolean{
         if(!userId || !roomId){
            console.log("roomId or userId not defined")
-           return;
+           return false;
         }
-        console.log("old State",this.userMap)
         const roomState=this.getRoomState(roomId)
-        const findUser=roomState?.find((u:any)=>u.userId===userId)
+        if(roomState===undefined){
+            console.log("room doesnt exists")
+            // ws.send(JSON.stringify({type:"ROOM_NOT_FOUND"}))
+            return false;
+        }
+        const findUser=roomState?.find((u:string)=>u===userId)
         if(findUser===undefined){
             this.addInRoom(roomId,userId)
-            console.log("new State",this.userMap)
         }
+        console.log("adding users",this.userMap)
+        return true;
     }
     public removeUser(userId:string,roomId:string,socketId:string){
         this.removeFromRoom(userId,roomId,socketId)
@@ -58,13 +76,8 @@ export class roomManager{
         return getRoomState
     }
     private addInRoom(roomId:string,userId:string){
-        let updateRoomstate
         const getState=this.getRoomState(roomId) ?? []
-        if(getState){
-            const user:User={userId,roomId}
-            updateRoomstate=this.userMap.set(roomId,[...getState,user])
-        }
-        return updateRoomstate
+        this.userMap.set(roomId,[...getState,{userId:userId}])
     }
     private removeFromRoom(userId:string,roomId:string,socketId:string){
         const roomState=this.getRoomState(roomId)

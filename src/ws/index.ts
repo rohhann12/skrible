@@ -7,7 +7,7 @@ export function initializeWebSocket(server: any) {
   wss.on("connection", (socket: any,req:any) => {
     console.log("Client connected")
     socket.on("message", (message:any) => {
-      handleMessage(wss, socket, message.toString(),req);
+      handleMessage(socket, message.toString(),req);
     });
 
     socket.on("close", () => {

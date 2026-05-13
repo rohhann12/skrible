@@ -5,7 +5,7 @@ import { verifyToken } from "../services/authService.js";
 export interface CustomWebSocket extends WebSocket {
   userId?: string;
 }
-export function handleMessage(ws:any,userSocket:CustomWebSocket,raw:any,req:any){
+export function handleMessage(userSocket:CustomWebSocket,raw:any,req:any){
      const url=new URL(req.url!,"http://localhost")
     const token=url.searchParams.get("token")
     if(!token){
@@ -20,14 +20,17 @@ export function handleMessage(ws:any,userSocket:CustomWebSocket,raw:any,req:any)
     // console.log("userSocket",userSocket)
     const parse=JSON.parse(raw);
     if(parse.type===CREATE_ROOM){
-        const userId=parse.userId
+        const userId=userSocket.userId!
         console.log("userId",userId)
-        const socketId=userSocket.userId
-        console.log("socket",socketId)
-        room_Manager.createRoom(userId,socketId)
+        room_Manager.createRoom(userId,userId,userSocket)
     }else if(parse.type===JOIN_ROOM){
-       const userId=parse.userId
+       const userId=userSocket.userId!
        const roomId=parse.roomId
-       room_Manager.addUser(userId,roomId)
+       const joined=room_Manager.addUser(userSocket,userId,roomId)
+       if(joined){
+         userSocket.send(JSON.stringify({ type:"JOIN_SUCCESS", roomId }))
+       }else{
+         userSocket.send(JSON.stringify({ type:"ROOM_NOT_FOUND", roomId }))
+       }
     }
 }
