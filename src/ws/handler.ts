@@ -1,6 +1,6 @@
 import type WebSocket from "ws";
 import { room_Manager } from "../server.js";
-import { CREATE_ROOM, JOIN_ROOM } from "../types/types.js";
+import { CREATE_ROOM, JOIN_ROOM, REJOIN_ROOM } from "../types/types.js";
 import { verifyToken } from "../services/authService.js";
 export interface CustomWebSocket extends WebSocket {
   userId?: string;
@@ -32,5 +32,10 @@ export function handleMessage(userSocket:CustomWebSocket,raw:any,req:any){
        }else{
          userSocket.send(JSON.stringify({ type:"ROOM_NOT_FOUND", roomId }))
        }
+    }else if(parse.tye===REJOIN_ROOM){
+      const userId=userSocket.userId
+      const roomId=parse.roomId
+      const join=room_Manager.addUser(userSocket,userId,roomId)
+      console.log("rejoined the user")
     }
 }
