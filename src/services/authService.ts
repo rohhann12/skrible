@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import { prisma } from '../config/prisma.js'
 import crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
+export const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
 const SALT_ROUNDS = 10
 
 export async function register(email: string, password: string): Promise<string> {

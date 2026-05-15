@@ -1,6 +1,7 @@
 import { prisma } from "../../config/prisma.js"
 import type WebSocket from "ws"
-
+import { JWT_SECRET } from "../../services/authService.js"
+import jwt from 'jsonwebtoken'
 interface User{
     userId:string
     // roomId:string
@@ -11,10 +12,12 @@ export class roomManager{
     private  userMap:any
     private  reverserUserMap:any
     private room:any
+    private userInteractions:any
     private constructor(){
         // this.instance=new roomManager()
     this.userMap=new Map<string,User[]>()
     this.reverserUserMap=new Map<string,string>()
+    this.userInteractions=new Map<string,Map<string,string[]>>()
 }
 
     static getInstance() {
@@ -70,6 +73,32 @@ export class roomManager{
     public removeUser(userId:string,roomId:string,socketId:string){
         this.removeFromRoom(userId,roomId,socketId)
         return this.userMap
+    }
+    public async relayMessage(socket:WebSocket,points:number,token:string,roomId:Number){
+        const tokenEmail= jwt.verify(token,JWT_SECRET) as string 
+        console.log("tokenEmail",tokenEmail)
+        // @ts-ignore
+        const email=tokenEmail.email
+        console.log("email",email)
+        const getUserId=await prisma.user.findUnique({
+            where:{
+                email:email
+            }
+        })
+        if(!getUserId){
+            console.log("user not found shouldnt even have got its message through socket u fucker")
+            return;
+        }
+        const a=socket.send(JSON.stringify({
+            "type": "STROKE",
+            // @ts-ignore
+            "points":points,
+            "roomId":roomId,
+        }))
+        console.log("a",a)
+        const userInteractionArr:string[]=this.userInteractions.get(roomId) ?? []
+        userInteractionArr.push(getUserId.email,JSON.stringify(points))
+        console.log("state",this.userInteractions)
     }
     private getRoomState(roomId:string){
         const getRoomState=this.userMap.get(roomId)

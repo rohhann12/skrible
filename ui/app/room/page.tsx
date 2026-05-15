@@ -25,8 +25,10 @@ export default function RoomPage() {
       console.log("data",data)
       if (data.type === "ROOM_CREATED") {
         router.push(`/room/${data.roomId}`);
+        localStorage.setItem("room",data.roomId)
       } else if (data.type === "JOIN_SUCCESS") {
         router.push(`/room/${data.roomId}`);
+        localStorage.setItem("room",data.roomId)
       } else if (data.type === "ROOM_NOT_FOUND") {
         setError("Room not found. Check the ID and try again.");
       }

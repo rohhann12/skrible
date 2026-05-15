@@ -1,6 +1,6 @@
 import type WebSocket from "ws";
 import { room_Manager } from "../server.js";
-import { CREATE_ROOM, JOIN_ROOM, REJOIN_ROOM } from "../types/types.js";
+import { CREATE_ROOM, JOIN_ROOM, REJOIN_ROOM, STROKE } from "../types/types.js";
 import { verifyToken } from "../services/authService.js";
 export interface CustomWebSocket extends WebSocket {
   userId?: string;
@@ -37,5 +37,15 @@ export function handleMessage(userSocket:CustomWebSocket,raw:any,req:any){
       const roomId=parse.roomId
       const join=room_Manager.addUser(userSocket,userId,roomId)
       console.log("rejoined the user")
+    }else if(parse.type===STROKE){
+      // KISNE DRAW KRA HAI
+      // USKE X,Y
+      // ROOMID
+      const points=parse.points
+      const token=parse.token
+      const roomId=parse.roomId
+      console.log({points,token,roomId})
+      const relay=room_Manager.relayMessage(userSocket,points,token,roomId)
+      console.log("relayed",relay)
     }
 }
